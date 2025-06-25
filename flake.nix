@@ -6,24 +6,64 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
 
         # Update these two lines for each new release:
-        codellmVersion = "1.99.32404";
+        #codellmVersion = "1.99.32404";
+        codellmVersion = "1.99.32500";
         codellmSha256 = "sha256-Wdy2plOI/batpRAiN8Uc+iNMgVRt7nl0EXeyXzDuzxc=";
+        #codellmSha256 = "sha256-Wdy2plOI/batpRAiN8Uc+iNMgVRt7nl0EXeyXzDuzxc=";
 
         # FIX: Define the required runtime libraries in one place.
         # These are needed for both build-time patching and the runtime FHS environment.
         runtimeLibs = with pkgs; [
-          musl glib gtk3 pango cairo xorg.libX11 xorg.libxcb xorg.libXext
-          xorg.libXcomposite xorg.libXdamage xorg.libXfixes xorg.libXrandr
-          libgbm mesa libGL libGLU expat libxkbcommon systemd alsa-lib atk
-          nss nspr dbus cups at-spi2-atk at-spi2-core gdk-pixbuf libdrm
-          xorg.libXScrnSaver xorg.libXtst xorg.libXi xorg.libXcursor fontconfig
-          freetype xorg.libxkbfile zlib
+          musl
+          glib
+          gtk3
+          pango
+          cairo
+          xorg.libX11
+          xorg.libxcb
+          xorg.libXext
+          xorg.libXcomposite
+          xorg.libXdamage
+          xorg.libXfixes
+          xorg.libXrandr
+          libgbm
+          mesa
+          libGL
+          libGLU
+          expat
+          libxkbcommon
+          systemd
+          alsa-lib
+          atk
+          nss
+          nspr
+          dbus
+          cups
+          at-spi2-atk
+          at-spi2-core
+          gdk-pixbuf
+          libdrm
+          xorg.libXScrnSaver
+          xorg.libXtst
+          xorg.libXi
+          xorg.libXcursor
+          fontconfig
+          freetype
+          xorg.libxkbfile
+          zlib
         ];
 
         # This is the FHS environment containing all of Electron's runtime dependencies.
@@ -66,43 +106,43 @@
 
           # The install phase is where we build the final package structure.
           installPhase = ''
-            runHook preInstall
+                        runHook preInstall
 
-            # Create standard directories for the application, binaries, and desktop files.
-            mkdir -p $out/lib/codellm $out/bin $out/share/applications $out/share/pixmaps
+                        # Create standard directories for the application, binaries, and desktop files.
+                        mkdir -p $out/lib/codellm $out/bin $out/share/applications $out/share/pixmaps
 
-            # Copy the already-unpacked contents from the build directory
-            # into our desired location in the Nix store.
-            cp -r ./* $out/lib/codellm/
+                        # Copy the already-unpacked contents from the build directory
+                        # into our desired location in the Nix store.
+                        cp -r ./* $out/lib/codellm/
 
-            # Find the application icon, assuming it's named 'icon.png' somewhere in the package.
-            # Electron apps often bundle it this way.
-            APP_ICON_PATH=$(find $out/lib/codellm -name icon.png | head -n 1)
-            if [ -f "$APP_ICON_PATH" ]; then
-              cp "$APP_ICON_PATH" $out/share/pixmaps/codellm.png
-            fi
+                        # Find the application icon, assuming it's named 'icon.png' somewhere in the package.
+                        # Electron apps often bundle it this way.
+                        APP_ICON_PATH=$(find $out/lib/codellm -name icon.png | head -n 1)
+                        if [ -f "$APP_ICON_PATH" ]; then
+                          cp "$APP_ICON_PATH" $out/share/pixmaps/codellm.png
+                        fi
 
-            # Create a wrapper script. This is the magic.
-            # It creates an executable file at $out/bin/codellm that runs the *real*
-            # binary ($out/lib/codellm/codellm) inside the FHS sandbox.
-	    #makeWrapper ${fhs}/bin/codellm-fhs-env $out/bin/codellm \
-	    # --add-flags "$out/lib/codellm/codellm"
-	    makeWrapper ${fhs}/bin/codellm-fhs-env $out/bin/codellm \
-	      --add-flags "$out/lib/codellm/bin/codellm"
+                        # Create a wrapper script. This is the magic.
+                        # It creates an executable file at $out/bin/codellm that runs the *real*
+                        # binary ($out/lib/codellm/codellm) inside the FHS sandbox.
+            	    #makeWrapper ${fhs}/bin/codellm-fhs-env $out/bin/codellm \
+            	    # --add-flags "$out/lib/codellm/codellm"
+            	    makeWrapper ${fhs}/bin/codellm-fhs-env $out/bin/codellm \
+            	      --add-flags "$out/lib/codellm/bin/codellm"
 
-            # Create the .desktop file needed for application launchers like Fuzzel.
-            cat > $out/share/applications/codellm.desktop <<EOF
-            [Desktop Entry]
-            Name=CodeLLM
-            Comment=CodeLLM AI Coding Assistant
-            Exec=$out/bin/codellm
-            Icon=codellm
-            Type=Application
-            Categories=Development;
-            StartupWMClass=CodeLLM
-            EOF
+                        # Create the .desktop file needed for application launchers like Fuzzel.
+                        cat > $out/share/applications/codellm.desktop <<EOF
+                        [Desktop Entry]
+                        Name=CodeLLM
+                        Comment=CodeLLM AI Coding Assistant
+                        Exec=$out/bin/codellm
+                        Icon=codellm
+                        Type=Application
+                        Categories=Development;
+                        StartupWMClass=CodeLLM
+                        EOF
 
-            runHook postInstall
+                        runHook postInstall
           '';
         };
 
