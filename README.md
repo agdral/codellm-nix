@@ -1,49 +1,65 @@
+
 ---
 
 ### codellm-nix
 
-Welcome! This is a **personal Nix flake** for [codellm](https://github.com/dvogeldev/codellm-nix), making it easy to install and use the latest from [Abacus.AI](https://abacus.ai/) on **Linux x86_64** systems.
+Welcome! This is a **Nix flake package** for [codellm](https://github.com/dvogeldev/codellm-nix), designed to make it easy to install and use the latest from [Abacus.AI](https://abacus.ai/) on **NixOS (Linux x86_64)** systems.
 
 #### What is this?
 
-This repo provides a Nix flake that packages the latest Abacus.AI-powered `codellm` tool for **Linux x86_64**. It’s designed for easy installation and integration into your NixOS system or any Nix-enabled Linux x86_64 environment.
+This repo provides a Nix flake for installing `codellm` and its dependencies on NixOS. It’s tailored for **Linux x86_64** only—there is no support for ARM, macOS, Windows, or other platforms.
 
 #### Features
 
-- **Latest Abacus.AI**: Always pulls in the most recent Abacus.AI Python package.
-- **Nix Flake**: Reproducible, declarative, and easy to use.
-- **Linux x86_64 only**: No support for ARM, macOS, Windows, etc.
-- **Personal project**: Built for my own use, but you’re welcome to fork and adapt!
+- **NixOS Integration**: Easily install `codellm` as a system package or in your user environment.
+- **Latest Abacus.AI**: Pulls in the most recent Abacus.AI Python package.
+- **Reproducible Builds**: Thanks to Nix flakes, you get consistent and reliable builds.
+- **Linux x86_64 only**: No support for other architectures or operating systems.
+- **Personal project**: Built for my own use, but you’re welcome to fork, adapt, and experiment!
 
-#### How to Install
+#### Installation
 
-**With Nix flakes enabled:**
-
-1. **Install codellm to your user profile:**
-   ```sh
-   nix profile install github:dvogeldev/codellm-nix
-   ```
-
-2. **Run codellm directly (without installing):**
-   ```sh
-   nix run github:dvogeldev/codellm-nix
-   ```
-
-3. **Add to your NixOS configuration:**
-   In your `flake.nix`:
+1. **Enable flakes** on your NixOS system if you haven’t already. Add the following to your `/etc/nixos/configuration.nix`:
    ```nix
-   inputs.codellm-nix.url = "github:dvogeldev/codellm-nix";
+   nix = {
+     package = pkgs.nixFlakes;
+     extraOptions = ''
+       experimental-features = nix-command flakes
+     '';
+   };
    ```
-   Then, in your `configuration.nix`:
+
+2. **Add this flake** to your system configuration. In your `/etc/nixos/configuration.nix`, include:
    ```nix
-   environment.systemPackages = with pkgs; [
-     codellm-nix.packages.${system}.default
-   ];
+   {
+     inputs.codellm.url = "github:dvogeldev/codellm-nix";
+
+     outputs = { self, nixpkgs, codellm }: {
+       nixosConfigurations.mySystem = nixpkgs.lib.nixosSystem {
+         system = "x86_64-linux";
+         modules = [
+           {
+             environment.systemPackages = with pkgs; [
+               codellm.defaultPackage.x86_64-linux
+             ];
+           }
+         ];
+       };
+     };
+   }
    ```
+
+3. **Rebuild your system**:
+   ```sh
+   sudo nixos-rebuild switch
+   ```
+
+4. **Use codellm**:
+   Once installed, you can use `codellm` directly from your terminal.
 
 #### Requirements
 
-- [Nix](https://nixos.org/download.html) (with flakes enabled)
+- [NixOS](https://nixos.org/) with flakes enabled
 - Linux x86_64 system
 
 #### No Liability
@@ -59,4 +75,3 @@ Feel free to fork, adapt, or use this as inspiration for your own projects. PRs 
 **Happy hacking!**
 
 ---
-
