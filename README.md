@@ -70,6 +70,10 @@ This is a personal project, provided as-is, with **no warranty or liability what
 
 Feel free to fork, adapt, or use this as inspiration for your own projects. PRs are welcome, but please note this is maintained on a best-effort basis.
 
+#### License
+
+This project is released under the [Unlicense](LICENSE), placing it in the public domain. Feel free to use, modify, and distribute it as you wish.
+
 ---
 
 **Happy hacking!**
