@@ -19,10 +19,8 @@
         pkgs = nixpkgs.legacyPackages.${system};
 
         # Update these two lines for each new release:
-        #codellmVersion = "1.99.32404";
-        codellmVersion = "1.99.32500";
-        codellmSha256 = "sha256-LN5nAiP8LSH2I70bg/mX/B81UT9lglA15kC5+haP4/M=";
-        #codellmSha256 = "sha256-Wdy2plOI/batpRAiN8Uc+iNMgVRt7nl0EXeyXzDuzxc=";
+        codellmVersion = "1.101.22802";
+        codellmSha256 = "f562b9520f90c1b90221b50004f79ae9accdbc9a20d741edb87dd65d2efdc96d";
 
         # FIX: Define the required runtime libraries in one place.
         # These are needed for both build-time patching and the runtime FHS environment.
